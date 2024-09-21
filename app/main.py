@@ -25,6 +25,7 @@ async def process_images(image_ids: ImageId):
 
 
 @app.get("/images/{filename}")
+
 async def get_image(filename: str):
     file_path = os.path.join('static/images', filename)
     if os.path.exists(file_path):
