@@ -15,12 +15,6 @@ async def process_images(image_ids: ImageId):
     return {"message": "Images are being processed"}
 
 
-@app.get("/image/{id}")
-async def process_images(id: str):
-    process_image.delay(id)
-    return {"message": "Images are being processed"}
-
-
 @app.get("/images/{filename}")
 async def get_image(filename: str):
     file_path = os.path.join('static/images', filename)
