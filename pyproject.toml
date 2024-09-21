@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "xbox-image-service"
+version = "0.1.0"
+description = ""
+authors = ["supreltd@gmail.com"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+asyncpg = "^0.29.0"
+fastapi = {extras = ["all"], version = "^0.115.0"}
+celery = "^5.4.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
