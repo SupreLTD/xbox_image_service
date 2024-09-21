@@ -5,11 +5,9 @@ services:
     container_name: web
 #    restart: always
     build: .
-    command: "sh -c 'uvicorn app.main:app --port 8000 --reload'"
+    command: "sh -c 'uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload'"
     expose:
       - "8000"
-    ports:
-      - "8000:8000"
     volumes:
       - ./:/code
       - ./static:/static
@@ -17,21 +15,21 @@ services:
     depends_on:
       - redis
 
+
   redis:
     container_name: redis
-    image: "redis:alpine"
+    image: redis:alpine
     restart: always
     expose:
       - "6379"
-    ports:
-      - '6379:6379'
     env_file: .env
+
 
   celery:
     container_name: celery
     build: .
 #    restart: always
-    command: "celery -A app.worker worker -l info "
+    command: "celery -A app.worker worker -l info -Q main-queue -c 2"
     volumes:
       - ./:/code
       - ./static:/static
@@ -40,10 +38,13 @@ services:
       - redis
     env_file: .env
 
+
   caddy:
-    image: caddy
+    image: caddy:alpine
+    container_name: caddy
+    restart: always
     ports:
       - "80:80"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
-      - ./static:/static
+      - ./static:/srv
