@@ -1,5 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.responses import FileResponse
+from fastapi.security import APIKeyHeader
+from app.core.config import settings
 import os
 
 from app.tasks import process_image
@@ -7,8 +9,15 @@ from app.schemas import ImageId
 
 app = FastAPI()
 
+api_key_header = APIKeyHeader(name="X-API-Key")
 
-@app.post("/images/")
+
+async def verify_api_key(api_key: str = Depends(api_key_header)):
+    if api_key != settings.API_KEY:
+        raise HTTPException(status_code=403, detail="Access denied")
+
+
+@app.post("/images/", dependencies=[Depends(verify_api_key)])
 async def process_images(image_ids: ImageId):
     for image_id in image_ids.ids:
         process_image.delay(image_id)

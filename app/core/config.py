@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     CELERY_RESULT_BACKEND: str
     DBURL: str
     API_KEY: str
+    SERVER_HOST: str
 
     class Config:
         env_file = data_path = os.path.join(os.path.dirname(__file__), '../.env')
