@@ -18,4 +18,3 @@ celery.config_from_object(CeleryConfig)
 
 celery.conf.result_backend = settings.CELERY_RESULT_BACKEND
 celery.autodiscover_tasks(['app.tasks'])
-

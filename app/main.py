@@ -1,9 +1,9 @@
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.security import APIKeyHeader
-from app.core.config import settings
 import os
 
+from app.core.config import settings
 from app.tasks import process_image
 from app.schemas import ImageId
 
@@ -29,4 +29,4 @@ async def get_image(filename: str):
     file_path = os.path.join('static/images', filename)
     if os.path.exists(file_path):
         return FileResponse(file_path)
-    return {"error": "Image not found"}
+    raise HTTPException(status_code=404, detail="File not found")

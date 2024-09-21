@@ -1,23 +1,20 @@
 version: "3.8"
 
-x-common: &common
-  build:
-    context: .
-    dockerfile: Dockerfile
-  volumes:
-    - ./:/code
-    - ./static:/static
-  env_file: .env
-
 services:
   web:
-    <<: *common
     container_name: web
+#    restart: always
+    build: .
     command: "sh -c 'uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload'"
     expose:
       - "8000"
+    volumes:
+      - ./:/code
+      - ./static:/static
+    env_file: .env
     depends_on:
       - redis
+
 
   redis:
     container_name: redis
@@ -27,13 +24,20 @@ services:
       - "6379"
     env_file: .env
 
+
   celery:
-    <<: *common
     container_name: celery
-    command: "celery -A app.worker worker -l info -Q main-queue -c 2"
+    build: .
+#    restart: always
+    command: "celery -A app.worker worker -l info"
+    volumes:
+      - ./:/code
+      - ./static:/static
     depends_on:
       - web
       - redis
+    env_file: .env
+
 
   caddy:
     image: caddy:alpine

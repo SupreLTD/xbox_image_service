@@ -1,7 +1,7 @@
 import asyncio
 
 import httpx
-from celery import shared_task
+from app.worker import celery
 import asyncpg
 from PIL import Image
 from io import BytesIO
@@ -50,11 +50,11 @@ async def process(image_id):
             output_filename = f"{static_path}/images/{image_id}.jpg"
             original.save(output_filename)
             link = f"{settings.SERVER_HOST}/images/{image_id}.jpg"
-            await update_processed_image_url(conn, image_id, link)
+            # await update_processed_image_url(conn, image_id, link)
     finally:
         await conn.close()
 
 
-@shared_task(name='process_image')
+@celery.task(name='process_image')
 def process_image(image_id):
     asyncio.run(process(image_id))
