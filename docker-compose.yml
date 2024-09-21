@@ -1,35 +1,43 @@
 version: "3.8"
 
 services:
-  xbox_fastapi:
-    container_name: xbox_image
-    restart: always
+  web:
+    container_name: web
+#    restart: always
     build: .
-    command: "sh -c ' gunicorn -w 1 -k uvicorn.workers.UvicornWorker app.main:app --bind 0.0.0.0:8000 --timeout 600'"
+    command: "sh -c 'uvicorn app.main:app --port 8000 --reload'"
     expose:
       - "8000"
+    ports:
+      - "8000:8000"
     volumes:
-      - ./ten5whisper/backend:/code
+      - ./:/code
+      - ./static:/static
     env_file: .env
+    depends_on:
+      - redis
 
-  xbox_redis:
-    container_name: xbox_redis
+  redis:
+    container_name: redis
     image: "redis:alpine"
     restart: always
     expose:
       - "6379"
+    ports:
+      - '6379:6379'
     env_file: .env
 
-  xbox_celery_worker:
-    container_name: xbox_celery_worker
-    image: jrtec/ten5-backend:latest
-    restart: always
-    command: "celery -A app.core.worker worker -l info "
+  celery:
+    container_name: celery
+    build: .
+#    restart: always
+    command: "celery -A app.worker worker -l info "
     volumes:
-      - ./app:/code
+      - ./:/code
+      - ./static:/static
     depends_on:
-      - xbox_fastapi
-      - xbox_redis
+      - web
+      - redis
     env_file: .env
 
   caddy:
@@ -38,4 +46,4 @@ services:
       - "80:80"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
-      - ./static:/app/static
+      - ./static:/static

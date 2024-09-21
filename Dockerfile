@@ -5,8 +5,9 @@ ENV PIP_DEFAULT_TIMEOUT=480
 
 WORKDIR /code
 
-RUN apt clean && apt update && apt install ffmpeg -y
-COPY pyproject.toml poetry.lock* /code/
+RUN apt clean && apt update
+COPY . /code/
+
 
 RUN  pip install poetry
 RUN poetry config virtualenvs.create false
