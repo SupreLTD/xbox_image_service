@@ -3,9 +3,9 @@ version: "3.8"
 services:
   web:
     container_name: web
-#    restart: always
+    restart: unless-stopped
     build: .
-    command: "sh -c 'uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload'"
+    command: "sh -c 'uvicorn app.main:app --host 0.0.0.0 --port 8000'"
     expose:
       - "8000"
     volumes:
@@ -19,7 +19,7 @@ services:
   redis:
     container_name: redis
     image: redis:alpine
-    restart: always
+    restart: unless-stopped
     expose:
       - "6379"
     env_file: .env
@@ -28,7 +28,7 @@ services:
   celery:
     container_name: celery
     build: .
-#    restart: always
+    restart: unless-stopped
     command: "celery -A app.worker worker -l info"
     volumes:
       - ./:/code
@@ -42,7 +42,7 @@ services:
   caddy:
     image: caddy:alpine
     container_name: caddy
-    restart: always
+    restart: unless-stopped
     ports:
       - "80:80"
     volumes:
